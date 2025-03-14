@@ -112,7 +112,7 @@ with col2:
         shap_values = explainer.shap_values(input_df)
         
         st.subheader("Risk Outcome")
-        st.metric("Risk Level", "Good" if prediction == 0 else "Bad", f"{prob:.2%}")
+        st.metric("Risk Level", "Bad" if prediction == 0 else "Good", f"{prob:.2%}")
         st.plotly_chart(waterfall_chart(shap_values, feature_names, input_df.iloc[0]))
         st.text(generate_narrative(input_df.iloc[0], shap_values, feature_names))
         st.markdown("</div>", unsafe_allow_html=True)
