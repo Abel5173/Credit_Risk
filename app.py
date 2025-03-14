@@ -1,4 +1,3 @@
-# app.py
 import streamlit as st
 import pandas as pd
 import joblib
@@ -6,13 +5,11 @@ import shap
 import numpy as np
 import plotly.graph_objects as go
 
-# Load model and background data
 model = joblib.load("models/credit_risk_tpot.pkl")
 background_data = pd.read_csv("models/background_data.csv")
 explainer = shap.KernelExplainer(model.predict_proba, background_data)
 feature_names = background_data.columns.tolist()
 
-# Narrative function
 def generate_narrative(instance, shap_values, feature_names):
     shap_instance = shap_values[0, :, 1]
     narrative = "Explanation for this prediction:\n"
@@ -23,7 +20,6 @@ def generate_narrative(instance, shap_values, feature_names):
             narrative += f"- {feature} ({value:.2f}) decreased risk by {-contrib:.2f}\n"
     return narrative
 
-# Waterfall chart function
 def waterfall_chart(shap_values, feature_names, instance):
     shap_instance = shap_values[0, :, 1]
     fig = go.Figure(go.Waterfall(
@@ -35,7 +31,6 @@ def waterfall_chart(shap_values, feature_names, instance):
     fig.update_layout(title="Feature Impact on Risk", showlegend=False)
     return fig
 
-# Streamlit app with neumorphic styling
 st.set_page_config(layout="wide")
 st.markdown("""
     <style>
@@ -48,7 +43,7 @@ st.title("Credit Risk Dashboard", anchor="neumorphic-title")
 col1, col2 = st.columns([1, 2])
 
 with col1:
-    st.markdown("<div class='neumorphic'><h3>Your Profile</h3>", unsafe_allow_html=True)
+    
     with st.form("input_form"):
         input_data = {}
         
@@ -110,13 +105,12 @@ with col1:
 with col2:
     if submit:
         input_df = pd.DataFrame([input_data], columns=feature_names)
-        st.write("Input Data:", input_df)  # Debug: Show input
+        st.write("Input Data:", input_df) 
         prediction = model.predict(input_df)[0]
         prob = model.predict_proba(input_df)[0][1]
-        st.write("Prediction:", prediction, "Probability:", prob)  # Debug: Raw output
+        st.write("Prediction:", prediction, "Probability:", prob)  
         shap_values = explainer.shap_values(input_df)
         
-        st.markdown("<div class='neumorphic'>", unsafe_allow_html=True)
         st.subheader("Risk Outcome")
         st.metric("Risk Level", "Good" if prediction == 0 else "Bad", f"{prob:.2%}")
         st.plotly_chart(waterfall_chart(shap_values, feature_names, input_df.iloc[0]))
